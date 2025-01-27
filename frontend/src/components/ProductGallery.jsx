@@ -23,7 +23,7 @@ const ProductGallery = () => {
       <div className="text-center mb-5" style={{ backgroundColor: 'rgba(0, 0, 0, 0.5)', padding: '2rem', borderRadius: '8px' }}>
         <h1 className="mb-3">Nuestro Compromiso</h1>
         <p style={{ fontSize: '1.2rem', lineHeight: '1.8' }}>
-          En <strong>Nancy Angulo Colchones para camiones</strong>, nos dedicamos a brindar la máxima comodidad a los transportistas, entendiendo el arduo trabajo y largas horas en la carretera. Nuestros productos están diseñados para garantizar descanso y confort, porque sabemos que un transportista descansado es un transportista seguro.
+          En <strong>Nancy Angulo Colchones</strong>, nos dedicamos a brindar la máxima comodidad a los transportistas, entendiendo el arduo trabajo y largas horas en la carretera. Nuestros productos están diseñados para garantizar descanso y confort, porque sabemos que un transportista descansado es un transportista seguro.
         </p>
       </div>
 
