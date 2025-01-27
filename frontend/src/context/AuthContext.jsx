@@ -1,21 +1,20 @@
-// src/context/AuthContext.jsx
-import React, { createContext, useState } from 'react';
+import React, { createContext, useState, useContext } from 'react';
 
-export const AuthContext = createContext();
+const AuthContext = createContext();
 
+// Proveedor del contexto
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
   const login = (email, password) => {
-    // Lógica de autenticación
+    
     if (email === 'user@example.com' && password === 'password123') {
       setIsAuthenticated(true);
       setUser({ email });
       localStorage.setItem('user', JSON.stringify({ email }));
-      return true;
     } else {
-      return false;
+      return false; 
     }
   };
 
@@ -30,4 +29,9 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
+};
+
+// Hook para usar el AuthContext
+export const useAuth = () => {
+  return useContext(AuthContext);
 };

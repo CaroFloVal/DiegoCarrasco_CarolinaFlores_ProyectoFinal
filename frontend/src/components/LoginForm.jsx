@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import './LoginForm.css'; 
-import { useNavigate } from 'react-router-dom'; // Importar el hook useNavigate
-import useAuth from '../hooks/useAuth';
+import { useAuth } from '../context/AuthContext'; // Importar el hook para el contexto
 
 const LoginForm = () => {
   const [email, setEmail] = useState('');
@@ -9,18 +8,22 @@ const LoginForm = () => {
   const [errorMessage, setErrorMessage] = useState('');
 
   // Obtener login y el estado del contexto
-  const { login } = useAuth();
-  const navigate = useNavigate(); // Inicializar useNavigate
+  const { login, isAuthenticated } = useAuth();
 
   const handleSubmit = (e) => {
     e.preventDefault();
 
     if (login(email, password)) {
-      navigate('/'); // Redirige a la página principal al iniciar sesión exitosamente
+      alert('¡Inicio de sesión exitoso!');
     } else {
       setErrorMessage('Correo electrónico o contraseña incorrectos');
     }
   };
+
+  // Si el usuario ya está autenticado, redirigirlo a otra página (como Home)
+  if (isAuthenticated) {
+    return <div>Ya estás logueado!</div>;
+  }
 
   return (
     <div className="login-form-container">
