@@ -1,20 +1,27 @@
-import React, { createContext, useState, useContext } from 'react';
+import React, { createContext, useState, useContext, useEffect } from 'react';
 
 const AuthContext = createContext();
 
-// Proveedor del contexto
 export const AuthProvider = ({ children }) => {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [user, setUser] = useState(null);
 
+  // Cargar el estado de autenticación desde localStorage
+  useEffect(() => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
+      setIsAuthenticated(true);
+      setUser(JSON.parse(storedUser));
+    }
+  }, []);
+
   const login = (email, password) => {
-    
     if (email === 'user@example.com' && password === 'password123') {
       setIsAuthenticated(true);
       setUser({ email });
       localStorage.setItem('user', JSON.stringify({ email }));
     } else {
-      return false; 
+      alert('Credenciales incorrectas. Inténtalo de nuevo.');
     }
   };
 
@@ -31,7 +38,6 @@ export const AuthProvider = ({ children }) => {
   );
 };
 
-// Hook para usar el AuthContext
 export const useAuth = () => {
   return useContext(AuthContext);
 };
