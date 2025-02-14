@@ -1,5 +1,4 @@
-const bcrypt = require('bcryptjs');
-const pool = require('../config/db'); 
+const bcrypt = require('bcrypt');
 
 async function login(req, res) {
     const { email, password } = req.body;
@@ -13,7 +12,6 @@ async function login(req, res) {
 
         const user = result.rows[0];
 
-        // 🔹 Comparar la contraseña ingresada con la almacenada
         const isPasswordValid = await bcrypt.compare(password, user.password);
 
         if (!isPasswordValid) {
