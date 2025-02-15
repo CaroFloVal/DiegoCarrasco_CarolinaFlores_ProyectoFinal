@@ -6,7 +6,7 @@ async function login(req, res) {
   const { email, password } = req.body;
 
   try {
-    // 🔍 1. Validación de campos
+    // 🔍 1. Validación de entrada
     if (!email || !password) {
       console.log("❌ Faltan campos obligatorios.");
       return res.status(400).json({ error: "Faltan campos obligatorios" });
@@ -23,10 +23,9 @@ async function login(req, res) {
     }
 
     const user = result.rows[0];
-
     console.log("🔑 Datos del usuario encontrado:", user);
 
-    // 🔍 3. Verificar si el campo de contraseña existe
+    // 🔍 3. Verificar si el campo 'password' existe
     if (!user.password) {
       console.log("❌ El campo 'password' es undefined en la base de datos.");
       return res.status(500).json({ error: "Error interno del servidor" });
@@ -43,4 +42,18 @@ async function login(req, res) {
     
     console.log("🔍 Resultado de bcrypt.compare:", isPasswordValid);
 
-    if (!
+    if (!isPasswordValid) {
+      console.log("❌ Contraseña incorrecta.");
+      return res.status(400).json({ error: "Credenciales inválidas" });
+    }
+
+    console.log("✅ Login exitoso");
+    res.json({ message: "Login exitoso", user });
+
+  } catch (error) {
+    console.error("❌ Error en login:", error);
+    res.status(500).json({ error: "Error interno del servidor" });
+  }
+}
+
+module.exports = { login };
