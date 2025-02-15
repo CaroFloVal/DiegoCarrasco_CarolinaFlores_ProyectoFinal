@@ -1,4 +1,5 @@
 import React, { createContext, useState, useContext, useEffect } from 'react';
+import API_BASE_URL from '../config';
 
 const AuthContext = createContext();
 
@@ -15,16 +16,31 @@ export const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  const login = (email, password) => {
-    if (email === 'user@example.com' && password === 'password123') {
+  // 🔹 Función para manejar el inicio de sesión con la API
+  const login = async (email, password) => {
+    try {
+      const response = await fetch(`${API_BASE_URL}/users/login`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Error al iniciar sesión');
+      }
+
+      // Guardamos el usuario en el estado y en localStorage
       setIsAuthenticated(true);
-      setUser({ email });
-      localStorage.setItem('user', JSON.stringify({ email }));
-    } else {
-      alert('Credenciales incorrectas. Inténtalo de nuevo.');
+      setUser(data.user);
+      localStorage.setItem('user', JSON.stringify(data.user));
+    } catch (error) {
+      alert(error.message);
     }
   };
 
+  // 🔹 Función para cerrar sesión
   const logout = () => {
     setIsAuthenticated(false);
     setUser(null);
@@ -41,3 +57,4 @@ export const AuthProvider = ({ children }) => {
 export const useAuth = () => {
   return useContext(AuthContext);
 };
+
