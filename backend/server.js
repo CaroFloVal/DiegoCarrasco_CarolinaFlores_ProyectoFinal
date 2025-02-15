@@ -1,38 +1,23 @@
-require('dotenv').config();
-const express = require('express');
-const cors = require('cors');
-const morgan = require('morgan');
+require("dotenv").config();
+const express = require("express");
+const cors = require("cors");
 
 const app = express();
 
-// 🔹 Middlewares globales
-app.use(cors());
+// Middleware para permitir JSON y CORS
 app.use(express.json());
-app.use(morgan('dev'));
+app.use(cors());
 
-// 🔹 Importación de rutas
-app.use('/api/users', require('./routes/userRoutes'));
-app.use('/api/products', require('./routes/productRoutes'));
-app.use('/api/orders', require('./routes/orderRoutes'));   
+// Importar rutas
+const userRoutes = require("./routes/userRoutes");
 
+// Usar las rutas con el prefijo correcto
+app.use("/api/users", userRoutes);
 
-// 🔹 Manejo de errores para rutas inexistentes (404)
-app.use((req, res, next) => {
-  res.status(404).json({ error: 'Ruta no encontrada' });
-});
-
-// 🔹 Middleware global de manejo de errores (500)
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).json({ error: 'Error interno del servidor' });
-});
-
+// Servidor en puerto
 const PORT = process.env.PORT || 5000;
-const server = app.listen(PORT, () => {
-  console.log(`✅ Servidor corriendo en el puerto ${PORT}`);
+app.listen(PORT, () => {
+    console.log(`🚀 Servidor corriendo en el puerto ${PORT}`);
 });
-
-// 🔹 Exportar para permitir pruebas con Jest y Supertest
-module.exports = { app, server };
 
 
