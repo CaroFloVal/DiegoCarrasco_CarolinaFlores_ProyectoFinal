@@ -1,11 +1,15 @@
-const { pool } = require('../config/db');
+require('dotenv').config();
+const pool = require('../config/db'); 
 const bcrypt = require('bcryptjs');
-
 
 async function login(req, res) {
     const { email, password } = req.body;
 
     try {
+        if (!email || !password) {
+            return res.status(400).json({ error: "Faltan campos obligatorios" });
+        }
+
         const result = await pool.query('SELECT * FROM users WHERE email = $1', [email]);
 
         if (result.rows.length === 0) {
@@ -22,7 +26,7 @@ async function login(req, res) {
 
         res.json({ message: "Login exitoso", user });
     } catch (error) {
-        console.error("Error en login:", error);
+        console.error("❌ Error en login:", error);
         res.status(500).json({ error: "Error interno del servidor" });
     }
 }
