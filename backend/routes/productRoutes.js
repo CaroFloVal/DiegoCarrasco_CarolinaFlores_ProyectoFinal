@@ -1,55 +1,84 @@
-const express = require('express');
+const express = require("express");
 const router = express.Router();
-const pool = require('../config/db');
-const authMiddleware = require('../middlewares/authMiddleware');
+const pool = require("../config/db");
+const authMiddleware = require("../middlewares/authMiddleware");
 
-// Obtener todos los productos
-router.get('/', async (req, res) => {
+// ✅ Obtener todos los productos (no requiere autenticación)
+router.get("/", async (req, res) => {
   try {
-    const result = await pool.query('SELECT * FROM products');
-    res.json(result.rows);
+    const result = await pool.query("SELECT * FROM products ORDER BY created_at DESC");
+    res.json({ success: true, products: result.rows });
   } catch (error) {
-    res.status(500).json({ error: 'Error al obtener productos' });
+    console.error("❌ Error al obtener productos:", error);
+    res.status(500).json({ success: false, error: "Error al obtener productos" });
   }
 });
 
-// Agregar un nuevo producto (solo usuarios autenticados)
-router.post('/', authMiddleware, async (req, res) => {
+// ✅ Obtener un producto por ID
+router.get("/:id", async (req, res) => {
+  const { id } = req.params;
+  try {
+    const result = await pool.query("SELECT * FROM products WHERE id = $1", [id]);
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: "Producto no encontrado" });
+    }
+    res.json({ success: true, product: result.rows[0] });
+  } catch (error) {
+    console.error("❌ Error al obtener el producto:", error);
+    res.status(500).json({ success: false, error: "Error al obtener el producto" });
+  }
+});
+
+// ✅ Agregar un nuevo producto (requiere autenticación)
+router.post("/", authMiddleware, async (req, res) => {
   const { name, description, price, stock } = req.body;
   try {
-    await pool.query(
-      'INSERT INTO products (name, description, price, stock) VALUES ($1, $2, $3, $4)',
+    const result = await pool.query(
+      "INSERT INTO products (name, description, price, stock) VALUES ($1, $2, $3, $4) RETURNING *",
       [name, description, price, stock]
     );
-    res.status(201).json({ message: 'Producto agregado exitosamente' });
+    res.status(201).json({ success: true, message: "Producto agregado", product: result.rows[0] });
   } catch (error) {
-    res.status(500).json({ error: 'Error al agregar producto' });
+    console.error("❌ Error al agregar producto:", error);
+    res.status(500).json({ success: false, error: "Error al agregar producto" });
   }
 });
 
-// Actualizar un producto (solo usuarios autenticados)
-router.put('/:id', authMiddleware, async (req, res) => {
+// ✅ Actualizar un producto (requiere autenticación)
+router.put("/:id", authMiddleware, async (req, res) => {
   const { name, description, price, stock } = req.body;
   const { id } = req.params;
   try {
-    await pool.query(
-      'UPDATE products SET name=$1, description=$2, price=$3, stock=$4 WHERE id=$5',
+    const result = await pool.query(
+      "UPDATE products SET name=$1, description=$2, price=$3, stock=$4 WHERE id=$5 RETURNING *",
       [name, description, price, stock, id]
     );
-    res.json({ message: 'Producto actualizado exitosamente' });
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: "Producto no encontrado" });
+    }
+
+    res.json({ success: true, message: "Producto actualizado", product: result.rows[0] });
   } catch (error) {
-    res.status(500).json({ error: 'Error al actualizar producto' });
+    console.error("❌ Error al actualizar producto:", error);
+    res.status(500).json({ success: false, error: "Error al actualizar producto" });
   }
 });
 
-// Eliminar un producto (solo usuarios autenticados)
-router.delete('/:id', authMiddleware, async (req, res) => {
+// ✅ Eliminar un producto (requiere autenticación)
+router.delete("/:id", authMiddleware, async (req, res) => {
   const { id } = req.params;
   try {
-    await pool.query('DELETE FROM products WHERE id=$1', [id]);
-    res.json({ message: 'Producto eliminado exitosamente' });
+    const result = await pool.query("DELETE FROM products WHERE id=$1 RETURNING *", [id]);
+
+    if (result.rows.length === 0) {
+      return res.status(404).json({ success: false, error: "Producto no encontrado" });
+    }
+
+    res.json({ success: true, message: "Producto eliminado", deletedProduct: result.rows[0] });
   } catch (error) {
-    res.status(500).json({ error: 'Error al eliminar producto' });
+    console.error("❌ Error al eliminar producto:", error);
+    res.status(500).json({ success: false, error: "Error al eliminar producto" });
   }
 });
 
