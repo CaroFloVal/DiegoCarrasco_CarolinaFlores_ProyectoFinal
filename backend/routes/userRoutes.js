@@ -1,13 +1,11 @@
 const express = require("express");
 const router = express.Router();
-const { login } = require("../controllers/authController");
+const { login, register } = require("../controllers/authController");
 
-// Ruta de prueba
-router.get("/", (req, res) => {
-    res.json({ message: "Usuarios encontrados" });
-});
-
-// Ruta correcta para login
+// Ruta para login
 router.post("/login", login);
+
+// Ruta para registro
+router.post("/register", register);
 
 module.exports = router;
